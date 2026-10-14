@@ -404,3 +404,7 @@ Route::prefix('/treasurer')->middleware(['auth.jwt', 'throttle:api'])->group(fun
     Route::get('/chart-data', [\App\Http\Controllers\Api\TreasurerDashboardController::class, 'chartData']);
     Route::get('/recent-activity', [\App\Http\Controllers\Api\TreasurerDashboardController::class, 'recentActivity']);
 });
+
+// Dashboard portal endpoints: current paths (/api/...) and versioned (/api/v1/...).
+require __DIR__.'/portal.php';
+Route::prefix('v1')->group(__DIR__.'/portal.php');
