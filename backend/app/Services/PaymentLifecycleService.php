@@ -47,6 +47,11 @@ class PaymentLifecycleService
         try {
             $member = DB::table('members')->where('id', $memberId)->first();
             $email = $member->email ?? null;
+            foreach (['users', 'auth_users'] as $t) {
+                if (! $email && ! empty($member->user_id) && \Illuminate\Support\Facades\Schema::hasTable($t)) {
+                    $email = DB::table($t)->where('id', $member->user_id)->value('email');
+                }
+            }
             if (! $email) {
                 return;
             }
@@ -56,7 +61,7 @@ class PaymentLifecycleService
             }
             $campaign = $campaignId ? DB::table('donation_campaigns')->where('id', $campaignId)->value('title') : null;
             $vars = [
-                'name' => trim(($member->first_name ?? '').' '.($member->last_name ?? '')) ?: ($member->full_name ?? 'Member'),
+                'name' => $member->name ?? 'Member',
                 'amount' => 'KES '.number_format($amount, 2),
                 'campaign' => $campaign ?: 'General donation',
                 'receipt' => $receipt,
