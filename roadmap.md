@@ -3,7 +3,7 @@
 - [x] Frontend preview in demo mode
 - [x] Restore Lovable theme backgrounds (sky, gold, crimson, pearl, morning)
 - [ ] Backend: API gap audit (frontend calls vs Laravel routes)
-- [ ] Backend: versioned API (/api/v1) keeping old paths working for production
+- [x] Backend: versioned API (/api/v1) keeping old paths working for production
 - [ ] Backend: add missing controllers/actions so every dashboard button works (zero API gap)
 - [ ] Backend: instant wallet update on payment (observers + queued jobs), correct totals
 - [ ] Backend: speed (indexes, caching, eager loading, queued SMS)
