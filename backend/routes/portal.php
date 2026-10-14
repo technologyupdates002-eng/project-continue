@@ -93,7 +93,6 @@ Route::middleware(['auth.jwt', 'throttle:api'])->group(function () {
             Route::post('unmatched/{id}/match', [A::class, 'matchUnmatched']);
             Route::get('bank-unmatched', [A::class, 'bankUnmatched']);
             Route::post('bank-unmatched/{id}/reconcile', [A::class, 'reconcileBankUnmatched']);
-            Route::get('notifications', [A::class, 'notifications']);
             Route::post('sms', [A::class, 'sendSms']);
             Route::get('events', [A::class, 'events']);
             Route::post('events', [A::class, 'createEvent']);
