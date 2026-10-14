@@ -1,0 +1,233 @@
+{
+  "info": {
+    "_postman_id": "d7729a45-c217-4e7f-8527-2b7c22512058",
+    "name": "KIRINYAGA HEALTH CARE WORKERS WELFARE GROUP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "42676020"
+  },
+  "item": [
+    {
+      "name": "Generate Token",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Basic {{base64_consumer_key_secret}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "grant_type=client_credentials",
+          "options": { "raw": { "language": "text" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/token",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "token" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "STK Push",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{stk_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"MessageReference\": \"{{message_reference}}\",\n    \"CallBackUrl\": \"{{callback_url}}\",\n    \"OperatorCode\": \"KIRINYAGA\",\n    \"TransactionCurrency\": \"KES\",\n    \"MobileNumber\": \"{{phone_number}}\",\n    \"Narration\": \"KIRINYAGA HEALTH CARE WORKERS\",\n    \"Amount\": 1,\n    \"MessageDateTime\": \"2026-08-24T09:22:25.420Z\",\n    \"OtherDetails\": [\n        { \"Name\": \"COOPTest\", \"Value\": \"1\" }\n    ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/FT/stk/1.0.0",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "FT", "stk", "1.0.0" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "STK Transaction Status",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{stk_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/Enquiry/STK/1.0.0/",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "Enquiry", "STK", "1.0.0", "" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Pesalink Validation",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{stk_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\",\n  \"AccountNumber\": \"{{account_number}}\",\n  \"RecipientBankIdentifier\": \"0011\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/Enquiry/Validation/IPSL/1.0.0/",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "Enquiry", "Validation", "IPSL", "1.0.0", "" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "B2C Send To Mpesa",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{b2c_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"ISO2CountryCode\": \"KE\",\n  \"CallBackUrl\": \"{{callback_url}}\",\n  \"Source\": {\n    \"AccountNumber\": \"{{account_number}}\",\n    \"Amount\": \"100\",\n    \"TransactionCurrency\": \"KES\",\n    \"Narration\": \"Coop test\"\n  },\n  \"Destinations\": [\n    {\n      \"ReferenceNumber\": \"{{message_reference}}_1\",\n      \"MobileNumber\": \"{{phone_number}}\",\n      \"Amount\": \"100\",\n      \"Narration\": \"Coop test\"\n    }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/FundsTransfer/External/A2M/Mpesa_v2/2.0.0",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "FundsTransfer", "External", "A2M", "Mpesa_v2", "2.0.0" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Pesalink Send to Account",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{pesalink_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\",\n  \"CallBackUrl\": \"{{callback_url}}\",\n  \"ISO2CountryCode\": \"KE\",\n  \"Source\": {\n    \"AccountNumber\": \"{{account_number}}\",\n    \"Amount\": 100,\n    \"TransactionCurrency\": \"KES\",\n    \"Narration\": \"COOP_Pesalink TEST\"\n  },\n  \"Destinations\": [\n    {\n      \"ReferenceNumber\": \"{{message_reference}}_1\",\n      \"AccountNumber\": \"{{account_number}}\",\n      \"BankCode\": \"11\",\n      \"Amount\": \"100\",\n      \"TransactionCurrency\": \"KES\",\n      \"Narration\": \"COOP_Pesalink TEST\"\n    }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/FundsTransfer/External/PesaLinkBulk_v1/1.0.0/",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "FundsTransfer", "External", "PesaLinkBulk_v1", "1.0.0", "" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "IFT Send to Account",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{ift_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\",\n  \"ISO2CountryCode\": \"KE\",\n  \"CallBackUrl\": \"{{callback_url}}\",\n  \"Source\": {\n    \"AccountNumber\": \"{{account_number}}\",\n    \"Amount\": 100,\n    \"TransactionCurrency\": \"KES\",\n    \"Narration\": \"COOP TEST\"\n  },\n  \"Destinations\": [\n    {\n      \"ReferenceNumber\": \"{{message_reference}}_1\",\n      \"AccountNumber\": \"{{account_number}}\",\n      \"Amount\": 100,\n      \"TransactionCurrency\": \"KES\",\n      \"Narration\": \"COOP TEST\"\n    }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/FundsTransfer/Internal/A2A_v3/3.0.0",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "FundsTransfer", "Internal", "A2A_v3", "3.0.0" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Transaction Status",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{status_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/Enquiry/TransactionStatus_V3/3.0.0/",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "Enquiry", "TransactionStatus_V3", "3.0.0", "" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account Balance",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{balance_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\",\n  \"AccountNumber\": \"{{account_number}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/Enquiry/AccountBalance_v2/2.0.0/",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "Enquiry", "AccountBalance_v2", "2.0.0", "" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account Ministatement",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{ministatement_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\",\n  \"AccountNumber\": \"{{account_number}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/Enquiry/MiniStatement/Account_v2/2.0.0/",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "Enquiry", "MiniStatement", "Account_v2", "2.0.0", "" ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Account Statement",
+      "request": {
+        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{statement_token}}", "type": "string" }] },
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json", "type": "text" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"MessageReference\": \"{{message_reference}}\",\n  \"UserId\": \"KirinyagaHealthCare\",\n  \"ISO2CountryCode\": \"KE\",\n  \"AccountNumber\": \"{{account_number}}\",\n  \"StartDate\": \"2026-08-24\",\n  \"EndDate\": \"2026-04-15\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "https://openapi.co-opbank.co.ke/Enquiry/AccountFullStatementPaginated/1.0.0/",
+          "protocol": "https",
+          "host": [ "openapi", "co-opbank", "co", "ke" ],
+          "path": [ "Enquiry", "AccountFullStatementPaginated", "1.0.0", "" ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

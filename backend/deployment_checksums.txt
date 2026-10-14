@@ -1,0 +1,7 @@
+# Source checksums for emergency production deployment
+
+## Local development environment
+6138712395b208763f1dd2a11b465cf11f8bc69b832a4c001710d0e0658e13bf  app/Http/Controllers/AuthController.php
+4cf5327662e91ecbb3e8bba00e6bbe9338f684b1b3fc9db0a9406685d08cb6be  app/Http/Controllers/Api/PresenceController.php
+9528329de6d20eeb23074289c9a98d9f2b7e41bc8a720b01f9b410d1cc961c65  tests/Feature/AuthenticationTest.php
+357ac08061c1ab140ea3a8180bb0afd6498ca20c2a62ee6336c78ff1d36c9784  tests/Feature/LoginActivityTest.php

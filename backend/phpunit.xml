@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_URL" value="http://localhost"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="3306"/>
+        <env name="DB_SOCKET" value="/run/mysqld/mysqld.sock"/>
+        <env name="DB_DATABASE" value="khwwc_test2"/>
+        <env name="DB_USERNAME" value="root"/>
+        <env name="DB_PASSWORD" value=""/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="COOP_ENABLE_REAL_CALLS" value="false"/>
+        <env name="COOP_ENVIRONMENT" value="sandbox"/>
+        <env name="COOP_CONSUMER_KEY" value="test_key"/>
+        <env name="COOP_CONSUMER_SECRET" value="test_secret"/>
+        <env name="COOP_SANDBOX_BASE_URL" value="https://openapi.co-opbank.co.ke"/>
+        <env name="COOP_TOKEN_URL" value="https://openapi.co-opbank.co.ke/token"/>
+        <env name="COOP_ACCOUNT_NUMBER" value="01134568843700"/>
+        <env name="COOP_USER_ID" value="KirinyagaHealthCare"/>
+        <env name="COOP_OPERATOR_CODE" value="KIRINYAGA"/>
+        <env name="COOP_CALLBACK_BASE_URL" value="https://app1.kirinyagahealthcareworkerswelfare.co.ke/api/banking/coop/callback"/>
+        <env name="JWT_SECRET" value="test-secret-for-testing-only-12345"/>
+    </php>
+</phpunit>
