@@ -8,11 +8,12 @@ import {
   ClipboardList, BadgeCheck, Globe, FileEdit, Inbox, Image, Mail,
   SlidersHorizontal, BarChart3, RefreshCw, Scale, Activity, Database,
   Server, Search, Wrench, ScrollText, Shield, Key, Lock, LogIn,
-  Home, X, ChevronDown, LogOut, UserCog, Menu, FlaskConical, Cloud, ToggleLeft, ToggleRight,
+  Home, X, ChevronDown, ChevronRight, LogOut, UserCog, Menu, FlaskConical, Cloud, ToggleLeft, ToggleRight,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth, roleLabels, roleDashboardPath } from '@/auth/AuthContext';
 import { navConfig, memberBottomNav, type NavItem } from '@/config/nav';
+import { groupNav } from '@/config/nav-groups';
 import { classNames, initials } from '@/lib/format';
 import type { UserRole } from '@/types';
 import { GroupChatWidget } from '@/components/GroupChatWidget';
@@ -33,6 +34,63 @@ const iconMap: Record<string, LucideIcon> = {
 function NavIcon({ name, size = 18, className }: { name: string; size?: number; className?: string }) {
   const Icon = iconMap[name] || LayoutDashboard;
   return <Icon size={size} className={className} />;
+}
+
+function NavLinkItem({ item, active, onNavigate, nested }: { item: NavItem; active: boolean; onNavigate?: () => void; nested?: boolean }) {
+  return (
+    <Link
+      to={item.path}
+      title={item.label}
+      onClick={onNavigate}
+      className={classNames(
+        'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+        nested && 'sidebar-nested',
+        active ? 'bg-primary-500 text-white' : 'text-neutral-400 hover:bg-white/5 hover:text-white',
+      )}
+    >
+      <NavIcon name={item.icon} size={nested ? 16 : 18} className={active ? 'text-white' : 'text-neutral-500'} />
+      <span className="sidebar-label truncate">{item.label}</span>
+    </Link>
+  );
+}
+
+function SidebarNav({ items, isActive, onNavigate }: { items: NavItem[]; isActive: (p: string) => boolean; onNavigate?: () => void }) {
+  const { pinned, groups } = groupNav(items);
+  const activeGroup = groups.find(g => g.items.some(i => isActive(i.path)))?.label;
+  const [open, setOpen] = useState<string | null>(activeGroup ?? null);
+  return (
+    <>
+      {pinned.map(item => <NavLinkItem key={item.path} item={item} active={isActive(item.path)} onNavigate={onNavigate} />)}
+      {groups.map(group => {
+        const expanded = open === group.label;
+        const hasActive = group.label === activeGroup;
+        return (
+          <div key={group.label}>
+            <button
+              type="button"
+              title={group.label}
+              aria-expanded={expanded}
+              onClick={() => setOpen(expanded ? null : group.label)}
+              className={classNames(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                hasActive ? 'text-white bg-white/5' : 'text-neutral-400 hover:bg-white/5 hover:text-white',
+              )}
+            >
+              <NavIcon name={group.icon} size={18} className={hasActive ? 'text-primary-400' : 'text-neutral-500'} />
+              <span className="sidebar-label truncate flex-1 text-left">{group.label}</span>
+              <span className="sidebar-label text-2xs text-neutral-500">{group.items.length}</span>
+              <ChevronRight size={14} className={classNames('sidebar-label transition-transform', expanded && 'rotate-90')} />
+            </button>
+            {expanded && (
+              <div className="sidebar-group-items animate-fade-in">
+                {group.items.map(item => <NavLinkItem key={item.path} item={item} active={isActive(item.path)} onNavigate={onNavigate} nested />)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
 }
 
 export function AppLayout({ children }: { children?: ReactNode }) {
@@ -99,22 +157,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 scrollbar-hide">
-          {navItems.map((item: NavItem) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              title={item.label}
-              className={classNames(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
-                isActive(item.path)
-                  ? 'bg-primary-500 text-white'
-                  : 'text-neutral-400 hover:bg-white/5 hover:text-white',
-              )}
-            >
-              <NavIcon name={item.icon} size={18} className={isActive(item.path) ? 'text-white' : 'text-neutral-500'} />
-              <span className="sidebar-label truncate">{item.label}</span>
-            </Link>
-          ))}
+          <SidebarNav items={navItems} isActive={isActive} />
         </nav>
 
         <div className="sidebar-footer px-3 py-3 border-t border-white/5">
@@ -189,20 +232,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
               </div>
             </div>
             <nav className="px-3 py-3 space-y-0.5">
-              {navItems.map(item => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setSidebarOpen(false)}
-                  className={classNames(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
-                    isActive(item.path) ? 'bg-primary-500 text-white' : 'text-neutral-400 hover:bg-white/5 hover:text-white',
-                  )}
-                >
-                  <NavIcon name={item.icon} size={18} className={isActive(item.path) ? 'text-white' : 'text-neutral-500'} />
-                  <span className="sidebar-label truncate">{item.label}</span>
-                </Link>
-              ))}
+              <SidebarNav items={navItems} isActive={isActive} onNavigate={() => setSidebarOpen(false)} />
             </nav>
             <div className="px-3 py-3 border-t border-white/5 space-y-2">
               <div className="px-3">
