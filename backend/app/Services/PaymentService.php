@@ -191,30 +191,34 @@ class PaymentService
 
     protected function generateBankNarration(string $paymentType, float $amount, array $data): string
     {
-        $amountStr = 'KES ' . number_format($amount, 0, '.', ',');
+        $amountStr = 'KES '.number_format($amount, 0, '.', ',');
+        $clean = fn (?string $v) => mb_strtoupper(preg_replace('/\s+/', ' ', trim(preg_replace('/[^A-Za-z0-9 ]/', '', (string) $v))));
 
         if ($paymentType === 'monthly_contribution') {
-            return 'PAY YOUR MONTHLY PAYMENT TO KHCWW';
+            $rate = $this->obligation
+                ? (float) $this->obligation->monthly()
+                : (float) (DB::table('welfare_settings')->value('monthly_contribution_amount') ?? 300);
+            $months = $rate > 0 ? (int) floor($amount / $rate) : 0;
+            $cover = $months > 1 ? " ({$months} MONTHS)" : ($months === 1 ? ' (1 MONTH)' : '');
+
+            return mb_substr("KHCWW MONTHLY CONTRIBUTION {$amountStr}{$cover}", 0, 100);
         }
 
         if ($paymentType === 'penalty') {
-            return "PAY YOUR PENALTY OF {$amountStr} TO KHCWW";
+            return "KHCWW PENALTY PAYMENT {$amountStr}";
         }
 
-        if ($paymentType === 'donation') {
-            $campaignName = $data['campaign_name'] ?? null;
+        if ($paymentType === 'donation' || $paymentType === 'fund_drive') {
+            $name = $data['campaign_name'] ?? (! empty($data['campaignId'])
+                ? DB::table('donation_campaigns')->where('id', $data['campaignId'])->value('title')
+                : null);
 
-            if ($campaignName) {
-                $sanitized = preg_replace('/[^A-Za-z0-9 ]/', '', $campaignName);
-                $sanitized = preg_replace('/\s+/', ' ', trim($sanitized));
-                $sanitized = mb_strtoupper($sanitized);
-                return "CONTRIBUTE TO {$sanitized} - KHCWW";
-            }
-
-            return "CONTRIBUTE TO FUND DRIVE - KHCWW";
+            return mb_substr($name
+                ? "KHCWW DONATION - {$clean($name)} {$amountStr}"
+                : "KHCWW DONATION - FUND DRIVE {$amountStr}", 0, 100);
         }
 
-        return strtoupper($paymentType) . ' PAYMENT TO KHCWW';
+        return mb_strtoupper($paymentType)." PAYMENT TO KHCWW {$amountStr}";
     }
 
     protected function extractInternalCheckoutId(?string $internalReference): ?string

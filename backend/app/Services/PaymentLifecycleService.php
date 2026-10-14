@@ -22,7 +22,7 @@ class PaymentLifecycleService
     {
         $paymentType = strtolower($paymentType);
 
-        return match ($paymentType) {
+        $result = match ($paymentType) {
             'monthly_contribution' => $this->postMonthlyContribution($memberId, $amount, $providerReference, $source),
             'fund_drive' => $this->postFundDrive($memberId, $amount, $providerReference, $relatedEntityId, $source, $existingPaymentId, $internalReference),
             'donation' => $relatedEntityId
@@ -32,6 +32,40 @@ class PaymentLifecycleService
             'operational' => $this->postOperational($memberId, $amount, $providerReference, $source, $existingPaymentId, $internalReference),
             default => throw new \InvalidArgumentException("Unknown payment type: {$paymentType}"),
         };
+
+        if (in_array($paymentType, ['donation', 'fund_drive'], true)
+            && ($result['success'] ?? false) && ! ($result['idempotent'] ?? false)) {
+            $this->sendDonationReceipt($memberId, $amount, $providerReference, $relatedEntityId);
+        }
+
+        return $result;
+    }
+
+    /** Email the member a donation receipt using the email settings configured on the dashboard. Never blocks the payment. */
+    private function sendDonationReceipt(string $memberId, float $amount, string $receipt, ?string $campaignId): void
+    {
+        try {
+            $member = DB::table('members')->where('id', $memberId)->first();
+            $email = $member->email ?? null;
+            if (! $email) {
+                return;
+            }
+            $mail = app(\App\Services\WebsiteMailService::class);
+            if (! ($mail->emailSettings()['enabled'] ?? false)) {
+                return;
+            }
+            $campaign = $campaignId ? DB::table('donation_campaigns')->where('id', $campaignId)->value('title') : null;
+            $vars = [
+                'name' => trim(($member->first_name ?? '').' '.($member->last_name ?? '')) ?: ($member->full_name ?? 'Member'),
+                'amount' => 'KES '.number_format($amount, 2),
+                'campaign' => $campaign ?: 'General donation',
+                'receipt' => $receipt,
+                'date' => now()->format('d M Y H:i'),
+            ];
+            app()->terminating(fn () => rescue(fn () => $mail->sendTemplate('donation_receipt', $email, $vars), report: true));
+        } catch (\Throwable $e) {
+            Log::warning('Donation receipt email skipped', ['member_id' => $memberId, 'error' => $e->getMessage()]);
+        }
     }
 
     private function postMonthlyContribution(string $memberId, float $amount, string $providerReference, string $source): array
