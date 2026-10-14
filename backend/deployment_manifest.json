@@ -1,0 +1,94 @@
+{
+  "deployment_type": "emergency_production_fix",
+  "deployment_date": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+  "target_host": "169.58.129.32",
+  "target_port": 6622,
+  "target_user": "kirinyag",
+  "target_app_path": "/home/kirinyag/public_html/app1.kirinyagahealthcareworkerswelfare.co.ke/khwwc",
+  
+  "issues_fixed": {
+    "1_online_users": {
+      "status": "FIXED",
+      "root_cause": "Config key mismatch in PresenceController: code read 'auth.presence_online_threshold_seconds' but actual config is 'presence.online_threshold_seconds'",
+      "fix": "Updated PresenceController.php methods memberStatus() and onlineUsers() to use correct config key",
+      "verification": "Config key now matches config/presence.php; presence TTL of 120s correctly enforced"
+    },
+    "2_heartbeat_reliability": {
+      "status": "FIXED",
+      "root_cause": "Heartbeat only refreshed presence TTL when activity=true flag was sent, but frontend sends empty POST (activity=false default)",
+      "fix": "Moved $now = now() outside if($isActive) block so every heartbeat call refreshes presence TTL, preserving session-idle logic separately",
+      "verification": "Regression test 'test_periodic_heartbeat_without_payload_refreshes_existing_presence_once' added and passing"
+    },
+    "3_bulk_sms_history": {
+      "status": "VERIFIED",
+      "root_cause": "None - already works with server-side pagination (25 campaigns per page)",
+      "verification": "BulkSmsController returns paginated results with proper cursors"
+    },
+    "4_time_based_greeting": {
+      "status": "REQUIRES_FRONTEND_VERIFICATION",
+      "note": "Frontend source not in local environment (compiled Vite build deployed to production)"
+    },
+    "5_private_chat": {
+      "status": "REQUIRES_VERIFICATION",
+      "note": "Chat uses REST API through /rest/v1/conversations, /rest/v1/messages, /rest/v1/conversation_participants endpoints; RestApiController handles all generic table operations"
+    },
+    "6_profile_images": {
+      "status": "IMPLEMENTED",
+      "canonical_field": "members.profile_picture_url",
+      "api_field": "avatar_url (in presence endpoint)",
+      "verification": "PresenceController maps profile_picture_url to avatar_url in response"
+    },
+    "7_payment_regression": {
+      "status": "VERIFIED",
+      "test_suites": ["PaymentLifecycleTest", "BankReconciliationTest", "WalletTest", "StkStatusPollingTest"],
+      "verification": "All 29 payment-related tests pass"
+    }
+  },
+  
+  "files_modified": [
+    {
+      "file": "app/Http/Controllers/AuthController.php",
+      "change": "Moved $now = now() outside if($isActive) block in heartbeat() method",
+      "lines": "38-45",
+      "why": "Ensure every heartbeat refreshes presence TTL, not just when activity=true"
+    },
+    {
+      "file": "app/Http/Controllers/Api/PresenceController.php",
+      "change": "Fixed config key from 'auth.presence_online_threshold_seconds' to 'presence.online_threshold_seconds' in memberStatus() and onlineUsers() methods",
+      "lines": "18, 73",
+      "why": "Align with actual config key defined in config/presence.php"
+    },
+    {
+      "file": "tests/Feature/AuthenticationTest.php",
+      "change": "Added regression test test_periodic_heartbeat_without_payload_refreshes_existing_presence_once()",
+      "lines": "145-180",
+      "why": "Verify heartbeat upserts presence row without duplication"
+    },
+    {
+      "file": "tests/Feature/LoginActivityTest.php",
+      "change": "Added regression test test_member_status_uses_the_configured_presence_expiry() with Config import",
+      "lines": "145-165",
+      "why": "Verify TTL config is honored by presence endpoint"
+    }
+  ],
+  
+  "no_deployment_needed": [
+    "frontend/src - Frontend source not deployed; production uses compiled Vite build"
+  ],
+  
+  "deployment_steps": [
+    "1. Backup production files being changed",
+    "2. Copy AuthController.php to production",
+    "3. Copy PresenceController.php to production",
+    "4. Clear Laravel config cache: config:clear",
+    "5. Clear route cache: route:clear (if routes changed)",
+    "6. Verify API endpoints respond with correct config values",
+    "7. Run production smoke tests"
+  ],
+  
+  "rollback_procedure": [
+    "SSH to production",
+    "Restore backed-up AuthController.php and PresenceController.php",
+    "Clear caches: config:clear, route:clear"
+  ]
+}

@@ -1,0 +1,1 @@
+import{n as e}from"./index-Bk13vXij.js";const i={list:async i=>e(`/rest/v1/beneficiaries?member_id=eq.${i}`),create:async i=>e("/rest/v1/beneficiaries",{method:"POST",body:JSON.stringify(i)}),update:async(i,s)=>e(`/rest/v1/beneficiaries?id=eq.${i}`,{method:"PATCH",body:JSON.stringify(s)}),delete:async i=>e(`/rest/v1/beneficiaries?id=eq.${i}`,{method:"DELETE"})};export{i as b};

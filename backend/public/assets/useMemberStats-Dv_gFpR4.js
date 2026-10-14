@@ -1,0 +1,1 @@
+import{i as r,n as e}from"./index-Bk13vXij.js";function a(a){return r({queryKey:["member-stats",a],queryFn:async()=>{const r=a?`/api/members/stats?member_id=${a}`:"/api/members/stats",{data:s}=await e(r);return Array.isArray(s)?s:[s].filter(Boolean)}})}export{a as u};
