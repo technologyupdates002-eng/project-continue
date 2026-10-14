@@ -31,6 +31,20 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(240)->by((string) ($subject ?: $request->ip()));
         });
 
+        // Any money change refreshes the saved dashboard figures immediately.
+        foreach ([
+            \App\Models\Payment::class, \App\Models\Contribution::class, \App\Models\WalletTransaction::class,
+            \App\Models\UnmatchedPayment::class, \App\Models\Penalty::class, \App\Models\PenaltyPayment::class,
+            \App\Models\PenaltyPaymentRecord::class, \App\Models\DonationPaymentRecord::class,
+            \App\Models\OperationalPaymentRecord::class, \App\Models\Expense::class, \App\Models\Payout::class,
+            \App\Models\OperationalWithdrawal::class, \App\Models\PenaltyWithdrawal::class,
+            \App\Models\DonationWithdrawal::class, \App\Models\BankTransaction::class, \App\Models\Member::class,
+        ] as $model) {
+            if (class_exists($model)) {
+                $model::observe(\App\Observers\FinancialChangeObserver::class);
+            }
+        }
+
         Event::listen(
             \App\Events\NewsPublished::class,
             \App\Listeners\SendNewsSmsNotification::class

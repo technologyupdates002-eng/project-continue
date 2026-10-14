@@ -30,6 +30,20 @@ class PaymentController extends Controller
         $this->rejectIfViewMode($request);
 
         try {
+            // Website may omit member_id / send account_ref: fill from the signed-in member.
+            if (! $request->filled('member_id')) {
+                $who = (array) $request->attributes->get('identity');
+                $mid = $who['member_id'] ?? (! empty($who['user_id'])
+                    ? \Illuminate\Support\Facades\DB::table('members')->where('user_id', $who['user_id'])->value('id')
+                    : null);
+                if ($mid) {
+                    $request->merge(['member_id' => (string) $mid]);
+                }
+            }
+            if (! $request->filled('accountReference') && $request->filled('account_ref')) {
+                $request->merge(['accountReference' => $request->input('account_ref')]);
+            }
+
             $data = $request->validate([
                 'member_id' => ['required', 'string'],
                 'amount' => ['required', 'numeric', 'min:1'],
