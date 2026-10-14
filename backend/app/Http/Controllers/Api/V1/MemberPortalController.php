@@ -30,7 +30,14 @@ class MemberPortalController extends PortalController
             $donations = (float) DB::table('donation_payment_records')->where('member_id', $memberId)
                 ->whereIn('status', ['verified', 'completed', 'paid', 'confirmed'])->sum('amount');
 
+            $settings = DB::table('welfare_settings')->first();
+            $rate = (float) ($settings->monthly_contribution_amount ?? 300);
+
             return [
+                'monthly_rate' => $rate,
+                'grace_days' => (int) ($settings->penalty_grace_days ?? 30),
+                'penalty_rate' => (float) ($settings->penalty_amount ?? 50),
+                'months_covered' => $rate > 0 ? (int) floor(((float) $contrib->total) / $rate) : 0,
                 'contributions_total' => (float) $contrib->total,
                 'contributions_count' => (int) $contrib->cnt,
                 'penalties_total' => $penalties,

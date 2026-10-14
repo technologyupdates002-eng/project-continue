@@ -10,3 +10,8 @@
 - [x] Deployment instructions for the upgrade
 - [ ] Frontend: switch preview to real server (api.khwwc.co.ke) — blocked: upgrade must be uploaded to hosting first
 - [ ] Public website: redesign, admin management for every page, seed content, news/blog photos
+- [x] Member Pay button: dropdown (Monthly contribution / Penalty / Fund drive)
+- [x] Contribution allocation by admin rate (e.g. 10000 KES covers N months), penalties after admin grace period + SMS reminder
+- [x] Wallets & statements update cleanly on every payment
+- [x] STK push narration per payment type; fund drive recorded as donation, donation email confirmation
+- [x] Member dashboard redesign: simple grouped menu, overview, quick actions (keep existing design)

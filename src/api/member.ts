@@ -25,6 +25,10 @@ export const memberApi = {
     recent_contributions: Contribution[];
     unread_notifications: number;
     status: string;
+    monthly_rate?: number;
+    grace_days?: number;
+    penalty_rate?: number;
+    months_covered?: number;
   }>('/member/dashboard'),
 
   getContributions: (page = 1) =>

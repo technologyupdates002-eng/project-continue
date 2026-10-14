@@ -98,6 +98,7 @@ export const mockMember = {
     wallet_balance: 84000, upcoming_events: demoEvents.filter(e => e.status === 'upcoming').slice(0, 3),
     recent_contributions: demoContributions.filter(c => c.member_id === 'm1').slice(0, 5),
     unread_notifications: demoNotifications.filter(n => !n.read).length, status: 'active',
+    monthly_rate: 2000, grace_days: 30, penalty_rate: 500, months_covered: 42,
   }),
   getContributions: (page = 1) => tryApi(
     () => memberApi.getContributions(page),

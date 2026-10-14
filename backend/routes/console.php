@@ -64,3 +64,8 @@ Schedule::command('coop:cleanup-tokens')
     ->when(function () {
         return (bool) config('coop_bank.enable_real_calls', false);
     });
+
+// Penalties are created only after the admin's grace period (welfare_settings.penalty_grace_days),
+// then members with overdue months get an SMS reminder.
+Schedule::command('penalties:assess')->dailyAt('07:00')->withoutOverlapping();
+Schedule::command('reminders:overdue')->dailyAt('09:00')->withoutOverlapping();
